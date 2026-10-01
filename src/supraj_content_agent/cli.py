@@ -14,6 +14,11 @@ from .workflow import attach_draft, validate_job
 app = typer.Typer(no_args_is_help=True)
 
 
+@app.callback()
+def main() -> None:
+    """Supraj Content Agent developer utilities."""
+
+
 @app.command()
 def validate_example() -> None:
     """Run the Phase-1 gates against a local synthetic article."""
