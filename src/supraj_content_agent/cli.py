@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import typer
@@ -61,7 +61,8 @@ A failed check moves the job to a blocked state instead of allowing publication.
             typer.echo(f"- {finding.code}: {finding.message}")
 
     if job.status is JobStatus.READY_FOR_PR:
-        typer.echo(render_supraj_website_mdx(draft, date.today().isoformat()))
+        today = datetime.now(UTC).date().isoformat()
+        typer.echo(render_supraj_website_mdx(draft, today))
 
 
 if __name__ == "__main__":
