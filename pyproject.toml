@@ -1,19 +1,17 @@
 [project]
 name = "supraj-content-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "Validated content publishing workflow for supraj.dev"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "openai-agents>=0.4,<1",
   "pydantic>=2.11,<3",
   "pydantic-settings>=2.10,<3",
   "typer>=0.16,<1",
 ]
 
 [project.optional-dependencies]
-agents = [
-  "openai-agents>=0.4,<1",
-]
 workflow = [
   "langgraph>=0.6,<1",
 ]

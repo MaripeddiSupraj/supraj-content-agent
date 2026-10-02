@@ -13,4 +13,5 @@ class Settings(BaseSettings):
     website_repo: str = "MaripeddiSupraj/SuprajWebsite"
     website_default_branch: str = "main"
     website_blog_path: str = "src/content/blog"
+    model: str | None = None
     max_revision_attempts: int = 2
