@@ -54,3 +54,22 @@ def test_renderer_matches_supraj_website_frontmatter():
     assert 'tags: ["Automation", "AI Agents"]' in output
     assert 'heroEmoji: "⚙️"' in output
     assert "draft: false" in output
+
+
+def test_source_not_approved_by_research_is_blocking():
+    draft = make_draft(
+        sources=[
+            Source(title="Astro docs", publisher="Astro", url="https://docs.astro.build/"),
+            Source(title="Unknown docs", publisher="Unknown", url="https://example.com/docs"),
+        ]
+    )
+    report = validate_article(
+        draft,
+        approved_source_urls=[
+            "https://docs.astro.build/",
+            "https://docs.python.org/3/",
+        ],
+    )
+
+    assert not report.passed
+    assert "source.not_in_research" in {finding.code for finding in report.findings}

@@ -8,6 +8,7 @@ website pull-request stage.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from urllib.parse import urlparse
 
 from .models import ArticleDraft, ValidationFinding, ValidationReport
@@ -16,7 +17,10 @@ ALLOWED_SOURCE_SCHEMES = {"https"}
 MIN_DISTINCT_SOURCE_HOSTS = 2
 
 
-def validate_article(draft: ArticleDraft) -> ValidationReport:
+def validate_article(
+    draft: ArticleDraft,
+    approved_source_urls: Iterable[str] | None = None,
+) -> ValidationReport:
     findings: list[ValidationFinding] = []
 
     if len(draft.body_markdown.split()) < 300:
@@ -36,8 +40,11 @@ def validate_article(draft: ArticleDraft) -> ValidationReport:
         )
 
     hosts: set[str] = set()
+    draft_urls: set[str] = set()
     for source in draft.sources:
-        parsed = urlparse(str(source.url))
+        source_url = str(source.url)
+        draft_urls.add(source_url)
+        parsed = urlparse(source_url)
         if parsed.scheme not in ALLOWED_SOURCE_SCHEMES:
             findings.append(
                 ValidationFinding(
@@ -58,6 +65,20 @@ def validate_article(draft: ArticleDraft) -> ValidationReport:
                 ),
             )
         )
+
+    if approved_source_urls is not None:
+        approved = {str(url) for url in approved_source_urls}
+        unapproved = sorted(draft_urls - approved)
+        if unapproved:
+            findings.append(
+                ValidationFinding(
+                    code="source.not_in_research",
+                    message=(
+                        "Draft contains sources that were not approved by research: "
+                        + ", ".join(unapproved)
+                    ),
+                )
+            )
 
     if "TODO" in draft.body_markdown.upper():
         findings.append(
